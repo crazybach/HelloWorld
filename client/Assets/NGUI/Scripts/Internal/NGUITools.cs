@@ -170,6 +170,7 @@ static public class NGUITools
 
 	static public string GetHierarchy (GameObject obj)
 	{
+		if (obj == null) return "";
 		string path = obj.name;
 
 		while (obj.transform.parent != null)
@@ -308,9 +309,9 @@ static public class NGUITools
 
 			if (w != null)
 			{
-				Vector4 region = w.drawingDimensions;
-				box.center = new Vector3((region.x + region.z) * 0.5f, (region.y + region.w) * 0.5f);
-				box.size = new Vector3(region.z - region.x, region.w - region.y);
+				Vector3[] corners = w.localCorners;
+				box.center = Vector3.Lerp(corners[0], corners[2], 0.5f);
+				box.size = corners[2] - corners[0];
 			}
 			else
 			{
@@ -1120,12 +1121,14 @@ static public class NGUITools
 	/// Helper function that returns whether the specified MonoBehaviour is active.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public bool GetActive (Behaviour mb)
 	{
 #if UNITY_3_5
-		return mb != null && mb.enabled && mb.gameObject.active;
+		return mb && mb.enabled && mb.gameObject.active;
 #else
-		return mb != null && mb.enabled && mb.gameObject.activeInHierarchy;
+		return mb && mb.enabled && mb.gameObject.activeInHierarchy;
 #endif
 	}
 
@@ -1133,6 +1136,8 @@ static public class NGUITools
 	/// Unity4 has changed GameObject.active to GameObject.activeself.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public bool GetActive (GameObject go)
 	{
 #if UNITY_3_5
@@ -1146,6 +1151,8 @@ static public class NGUITools
 	/// Unity4 has changed GameObject.active to GameObject.SetActive.
 	/// </summary>
 
+	[System.Diagnostics.DebuggerHidden]
+	[System.Diagnostics.DebuggerStepThrough]
 	static public void SetActiveSelf (GameObject go, bool state)
 	{
 #if UNITY_3_5
@@ -1313,10 +1320,10 @@ static public class NGUITools
 	}
 
 	[System.Obsolete("Use NGUIText.EncodeColor instead")]
-	static public string EncodeColor (Color c) { return NGUIText.EncodeColor(c); }
+	static public string EncodeColor (Color c) { return NGUIText.EncodeColor24(c); }
 
 	[System.Obsolete("Use NGUIText.ParseColor instead")]
-	static public Color ParseColor (string text, int offset) { return NGUIText.ParseColor(text, offset); }
+	static public Color ParseColor (string text, int offset) { return NGUIText.ParseColor24(text, offset); }
 
 	[System.Obsolete("Use NGUIText.StripSymbols instead")]
 	static public string StripSymbols (string text) { return NGUIText.StripSymbols(text); }
@@ -1442,10 +1449,9 @@ static public class NGUITools
 	static public string GetFuncName (object obj, string method)
 	{
 		if (obj == null) return "<null>";
-		if (string.IsNullOrEmpty(method)) return "<Choose>";
 		string type = obj.GetType().ToString();
 		int period = type.LastIndexOf('.');
 		if (period > 0) type = type.Substring(period + 1);
-		return type + "." + method;
+		return string.IsNullOrEmpty(method) ? type : type + "." + method;
 	}
 }
