@@ -1,2 +1,11 @@
 client/Library/
 client/Temp/
+client/Assembly-CSharp-Editor-vs.csproj
+client/Assembly-CSharp-Editor.csproj
+client/Assembly-CSharp-Editor.pidb
+client/Assembly-CSharp-vs.csproj
+client/Assembly-CSharp.csproj
+client/Assembly-CSharp.pidb
+client/client-csharp.sln
+client/client.sln
+client/client.userprefs
