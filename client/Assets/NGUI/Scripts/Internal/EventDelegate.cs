@@ -3,16 +3,12 @@
 // Copyright © 2011-2014 Tasharen Entertainment
 //----------------------------------------------
 
-#if UNITY_EDITOR || !UNITY_FLASH
+#if UNITY_EDITOR || (!UNITY_FLASH && !NETFX_CORE && !UNITY_WP8)
 #define REFLECTION_SUPPORT
 #endif
 
 #if REFLECTION_SUPPORT
 using System.Reflection;
-#endif
-
-#if NETFX_CORE
-using System.Linq;
 #endif
 
 using System.Collections.Generic;
@@ -65,13 +61,8 @@ public class EventDelegate
 					if (obj != null && !string.IsNullOrEmpty(field))
 					{
 						System.Type type = obj.GetType();
-#if NETFX_CORE
-						propInfo = type.GetRuntimeProperty(field);
-						if (propInfo == null) fieldInfo = type.GetRuntimeField(field);
-#else
 						propInfo = type.GetProperty(field);
 						if (propInfo == null) fieldInfo = type.GetField(field);
-#endif
 					}
 				}
 				if (propInfo != null) return propInfo.GetValue(obj, null);
@@ -110,12 +101,12 @@ public class EventDelegate
 
 	// Private variables
 	public delegate void Callback();
-	[System.NonSerialized] Callback mCachedCallback;
-	[System.NonSerialized] bool mRawDelegate = false;
-	[System.NonSerialized] bool mCached = false;
+	Callback mCachedCallback;
+	bool mRawDelegate = false;
+	bool mCached = false;
 #if REFLECTION_SUPPORT
-	[System.NonSerialized] MethodInfo mMethod;
-	[System.NonSerialized] object[] mArgs;
+	MethodInfo mMethod;
+	object[] mArgs;
 #endif
 
 	/// <summary>
@@ -353,24 +344,15 @@ public class EventDelegate
 		{
 			if (mTarget != null && !string.IsNullOrEmpty(mMethodName))
 			{
+#if NETFX_CORE
+				System.Type type = mTarget.GetTypeInfo();
+#else
 				System.Type type = mTarget.GetType();
+#endif
 
 				try
 				{
-#if NETFX_CORE
-					// we can't use this since we don't seem to have the correct parameter type list yet
-					// mMethod = type.GetRuntimeMethod(mMethodName, (from p in mParameters select p.type).ToArray());
-
-					mMethod = (from m in type.GetRuntimeMethods() where m.Name == mMethodName && !m.IsStatic select m).FirstOrDefault();
-#else
-					for (mMethod = null; ; )
-					{
-						mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-						if (mMethod != null) break;
-						type = type.BaseType;
-						if (type == null) break;
-					}
-#endif
+					mMethod = type.GetMethod(mMethodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 				}
 				catch (System.Exception ex)
 				{
@@ -396,12 +378,7 @@ public class EventDelegate
 				if (info.Length == 0)
 				{
 					// No parameters means we can create a simple delegate for it, optimizing the call
-#if NETFX_CORE
-					mCachedCallback = (Callback)mMethod.CreateDelegate(typeof(Callback), mTarget);
-#else
 					mCachedCallback = (Callback)System.Delegate.CreateDelegate(typeof(Callback), mTarget, mMethodName);
-#endif
-
 					mArgs = null;
 					mParameters = null;
 					return;

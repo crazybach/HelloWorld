@@ -10,7 +10,6 @@ using UnityEditor;
 /// Inspector class used to edit UISpriteAnimations.
 /// </summary>
 
-[CanEditMultipleObjects]
 [CustomEditor(typeof(UISpriteAnimation))]
 public class UISpriteAnimationInspector : Editor
 {
@@ -20,15 +19,36 @@ public class UISpriteAnimationInspector : Editor
 
 	public override void OnInspectorGUI ()
 	{
-		GUILayout.Space(3f);
+		NGUIEditorTools.DrawSeparator();
 		NGUIEditorTools.SetLabelWidth(80f);
-		serializedObject.Update();
+		UISpriteAnimation anim = target as UISpriteAnimation;
 
-		NGUIEditorTools.DrawProperty("Framerate", serializedObject, "mFPS");
-		NGUIEditorTools.DrawProperty("Name Prefix", serializedObject, "mPrefix");
-		NGUIEditorTools.DrawProperty("Loop", serializedObject, "mLoop");
-		NGUIEditorTools.DrawProperty("Pixel Snap", serializedObject, "mSnap");
+		int fps = EditorGUILayout.IntField("Framerate", anim.framesPerSecond);
+		fps = Mathf.Clamp(fps, 0, 60);
 
-		serializedObject.ApplyModifiedProperties();
+		if (anim.framesPerSecond != fps)
+		{
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
+			anim.framesPerSecond = fps;
+			EditorUtility.SetDirty(anim);
+		}
+
+		string namePrefix = EditorGUILayout.TextField("Name Prefix", (anim.namePrefix != null) ? anim.namePrefix : "");
+
+		if (anim.namePrefix != namePrefix)
+		{
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
+			anim.namePrefix = namePrefix;
+			EditorUtility.SetDirty(anim);
+		}
+
+		bool loop = EditorGUILayout.Toggle("Loop", anim.loop);
+
+		if (anim.loop != loop)
+		{
+			NGUIEditorTools.RegisterUndo("Sprite Animation Change", anim);
+			anim.loop = loop;
+			EditorUtility.SetDirty(anim);
+		}
 	}
 }

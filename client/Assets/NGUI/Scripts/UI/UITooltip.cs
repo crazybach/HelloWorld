@@ -96,7 +96,7 @@ public class UITooltip : MonoBehaviour
 		if (text != null && !string.IsNullOrEmpty(tooltipText))
 		{
 			mTarget = 1f;
-			text.text = tooltipText;
+			if (text != null) text.text = tooltipText;
 
 			// Orthographic camera positioning is trivial
 			mPos = Input.mousePosition;

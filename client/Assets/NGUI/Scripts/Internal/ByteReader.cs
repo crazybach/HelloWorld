@@ -28,7 +28,6 @@ public class ByteReader
 
 	static public ByteReader Open (string path)
 	{
-#if UNITY_EDITOR || (!UNITY_FLASH && !NETFX_CORE && !UNITY_WP8)
 		FileStream fs = File.OpenRead(path);
 
 		if (fs != null)
@@ -40,7 +39,6 @@ public class ByteReader
 			fs.Close();
 			return new ByteReader(buffer);
 		}
-#endif
 		return null;
 	}
 

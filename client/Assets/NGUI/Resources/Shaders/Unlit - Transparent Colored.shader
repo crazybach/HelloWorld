@@ -85,6 +85,7 @@ Shader "Unlit/Transparent Colored"
 			Fog { Mode Off }
 			Offset -1, -1
 			ColorMask RGB
+			AlphaTest Greater .01
 			Blend SrcAlpha OneMinusSrcAlpha
 			ColorMaterial AmbientAndDiffuse
 			

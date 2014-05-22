@@ -393,8 +393,10 @@ public class UIPanel : UIRect
 			if (Mathf.Abs(mClipOffset.x - value.x) > 0.001f ||
 				Mathf.Abs(mClipOffset.y - value.y) > 0.001f)
 			{
+				mResized = true;
+				mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
 				mClipOffset = value;
-				InvalidateClipping();
+				mMatrixFrame = -1;
 
 				// Call the event delegate
 				if (onClipMove != null) onClipMove(this);
@@ -402,24 +404,6 @@ public class UIPanel : UIRect
 				if (!Application.isPlaying) UpdateDrawCalls();
 #endif
 			}
-		}
-	}
-
-	/// <summary>
-	/// Invalidate the panel's clipping, calling child panels in turn.
-	/// </summary>
-
-	void InvalidateClipping ()
-	{
-		mResized = true;
-		mMatrixFrame = -1;
-		mCullTime = (mCullTime == 0f) ? 0.001f : RealTime.time + 0.15f;
-
-		for (int i = 0; i < list.size; ++i)
-		{
-			UIPanel p = list[i];
-			if (p != this && p.parentPanel == this)
-				p.InvalidateClipping();
 		}
 	}
 
@@ -669,11 +653,7 @@ public class UIPanel : UIRect
 
 	public override float CalculateFinalAlpha (int frameID)
 	{
-#if UNITY_EDITOR
-		if (mAlphaFrameID != frameID || !Application.isPlaying)
-#else
 		if (mAlphaFrameID != frameID)
-#endif
 		{
 			mAlphaFrameID = frameID;
 			UIRect pt = parent;
@@ -784,8 +764,7 @@ public class UIPanel : UIRect
 	{
 		if ((mClipping == UIDrawCall.Clipping.None || mClipping == UIDrawCall.Clipping.ConstrainButDontClip) && !w.hideIfOffScreen)
 		{
-			if (clipCount == 0) return true;
-			if (mParentPanel != null) return mParentPanel.IsVisible(w);
+			if (mParentPanel == null || clipCount == 0) return true;
 		}
 
 		UIPanel p = this;
@@ -1104,11 +1083,7 @@ public class UIPanel : UIRect
 
 	void LateUpdate ()
 	{
-#if UNITY_EDITOR
-		if (mUpdateFrame != Time.frameCount || !Application.isPlaying)
-#else
 		if (mUpdateFrame != Time.frameCount)
-#endif
 		{
 			mUpdateFrame = Time.frameCount;
 
@@ -1745,11 +1720,7 @@ public class UIPanel : UIRect
 	{
 		int frame = Time.frameCount;
 
-#if UNITY_EDITOR
-		if (mSizeFrame != frame || !Application.isPlaying)
-#else
 		if (mSizeFrame != frame)
-#endif
 		{
 			mSizeFrame = frame;
 

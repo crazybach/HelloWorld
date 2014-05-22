@@ -656,7 +656,7 @@ public class UIInput : MonoBehaviour
 	/// Handle the specified event.
 	/// </summary>
 
-	protected virtual bool ProcessEvent (Event ev)
+	bool ProcessEvent (Event ev)
 	{
 		if (label == null) return false;
 

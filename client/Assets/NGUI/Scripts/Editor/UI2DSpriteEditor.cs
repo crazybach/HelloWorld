@@ -14,8 +14,12 @@ using System.Collections.Generic;
 /// </summary>
 
 [CanEditMultipleObjects]
+#if UNITY_3_5
+[CustomEditor(typeof(UI2DSprite))]
+#else
 [CustomEditor(typeof(UI2DSprite), true)]
-public class UI2DSpriteEditor : UIBasicSpriteEditor
+#endif
+public class UI2DSpriteEditor : UIWidgetInspector
 {
 	UI2DSprite mSprite;
 
@@ -24,10 +28,6 @@ public class UI2DSpriteEditor : UIBasicSpriteEditor
 		base.OnEnable();
 		mSprite = target as UI2DSprite;
 	}
-
-	/// <summary>
-	/// Should we draw the widget's custom properties?
-	/// </summary>
 
 	protected override bool ShouldDrawProperties ()
 	{
@@ -50,8 +50,7 @@ public class UI2DSpriteEditor : UIBasicSpriteEditor
 
 	public override bool HasPreviewGUI ()
 	{
-		return (Selection.activeGameObject == null || Selection.gameObjects.Length == 1) &&
-			(mSprite != null) && (mSprite.mainTexture as Texture2D != null);
+		return (mSprite != null) && (mSprite.mainTexture as Texture2D != null);
 	}
 
 	/// <summary>
@@ -63,7 +62,7 @@ public class UI2DSpriteEditor : UIBasicSpriteEditor
 		if (mSprite != null && mSprite.sprite2D != null)
 		{
 			Texture2D tex = mSprite.mainTexture as Texture2D;
-			if (tex != null) NGUIEditorTools.DrawSprite(tex, rect, mSprite.color, mSprite.sprite2D.textureRect, mSprite.border);
+			if (tex != null) NGUIEditorTools.DrawTexture(tex, rect, mSprite.uvRect, mSprite.color);
 		}
 	}
 }

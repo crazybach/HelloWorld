@@ -866,18 +866,12 @@ public class UIAtlasMaker : EditorWindow
 
 			if (create)
 			{
-#if UNITY_3_5 || UNITY_4_2
-				string path = EditorUtility.SaveFilePanel("Save As",
-					NGUISettings.currentPath, "New Atlas.prefab", "prefab");
-#else
-				string path = EditorUtility.SaveFilePanelInProject("Save As",
-					"New Atlas.prefab", "prefab", "Save atlas as...", NGUISettings.currentPath);
-#endif
-				if (!string.IsNullOrEmpty(path))
+				string prefabPath = EditorUtility.SaveFilePanelInProject("Save As", "New Atlas.prefab", "prefab", "Save atlas as...");
+
+				if (!string.IsNullOrEmpty(prefabPath))
 				{
-					NGUISettings.currentPath = System.IO.Path.GetDirectoryName(path);
-					GameObject go = AssetDatabase.LoadAssetAtPath(path, typeof(GameObject)) as GameObject;
-					string matPath = path.Replace(".prefab", ".mat");
+					GameObject go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
+					string matPath = prefabPath.Replace(".prefab", ".mat");
 					replace = true;
 
 					// Try to load the material
@@ -898,11 +892,11 @@ public class UIAtlasMaker : EditorWindow
 					}
 
 					// Create a new prefab for the atlas
-					Object prefab = (go != null) ? go : PrefabUtility.CreateEmptyPrefab(path);
+					Object prefab = (go != null) ? go : PrefabUtility.CreateEmptyPrefab(prefabPath);
 
 					// Create a new game object for the atlas
-					string atlasName = path.Replace(".prefab", "");
-					atlasName = atlasName.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
+					string atlasName = prefabPath.Replace(".prefab", "");
+					atlasName = atlasName.Substring(prefabPath.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
 					go = new GameObject(atlasName);
 					go.AddComponent<UIAtlas>().spriteMaterial = mat;
 
@@ -913,7 +907,7 @@ public class UIAtlasMaker : EditorWindow
 					AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
 
 					// Select the atlas
-					go = AssetDatabase.LoadAssetAtPath(path, typeof(GameObject)) as GameObject;
+					go = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject)) as GameObject;
 					NGUISettings.atlas = go.GetComponent<UIAtlas>();
 					Selection.activeGameObject = go;
 				}
