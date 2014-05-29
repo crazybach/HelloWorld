@@ -20,14 +20,20 @@ public class UI3DModelView : MonoBehaviour {
 		model.transform.parent = this.gameObject.transform;
 		*/
 		foreach(GameObject pivot in pivots){
+			Object  protype = Resources.Load("mon_goblinWizard");
+			if(protype == null){
+				Debug.Log("Load Resources Error");
+			}else{
+				GameObject  model = (Instantiate(protype, pivot.transform.position, Quaternion.identity) as GameObject); 
+				//GameObject.CreatePrimitive(PrimitiveType.Cube);
 			
-			GameObject  model = GameObject.CreatePrimitive(PrimitiveType.Cube);
-			
-			model.transform.position = pivot.transform.position;
-			model.transform.rotation = pivot.transform.rotation;
-			model.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+				//model.transform.position = pivot.transform.position;
+				//model.transform.rotation = pivot.transform.rotation;
+				//model.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 		
-			models.Add(model);
+				models.Add(model);
+			}
+			
 		};
 		
 		/*
@@ -46,7 +52,7 @@ public class UI3DModelView : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		foreach(GameObject model in models){
-			model.transform.Rotate(Time.deltaTime*10, 0, 0);
+			model.transform.Rotate(0, Time.deltaTime*10, 0);
 		}
 	}
 	
